@@ -5,7 +5,6 @@ import (
 	"os"
 )
 
-// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "gimme",
 	Short: "Gimme a database, quick!",

@@ -9,6 +9,13 @@ import (
 	"os"
 )
 
+var projectType string
+var format string
+
+const SPRING_PROJECT_TYPE = "spring"
+const YAML_FORMAT = "yaml"
+const YML_FORMAT = "yml"
+
 // dbCmd represents the db command
 var postgresCmd = &cobra.Command{
 	Use:     "postgres",
@@ -24,12 +31,25 @@ Usage:
 			fmt.Println("Docker is not running! Start docker then rerun this command.")
 			os.Exit(1)
 		}
-		//TODO: Output to different project types ex: --project-type spring --format yml
 		container := postgres.Start()
-		template.PrintSpringTemplate(container.Database)
+		//TODO: Rework this, should probably validate before starting the container.
+		switch projectType {
+		case SPRING_PROJECT_TYPE:
+			switch format {
+			case YAML_FORMAT, YML_FORMAT:
+				template.PrintSpringTemplate(container.Database)
+				break
+			default:
+				fmt.Println("Format not supported")
+			}
+		default:
+			fmt.Println("Project type not supported")
+		}
 	},
 }
 
 func init() {
 	dbCmd.AddCommand(postgresCmd)
+	postgresCmd.Flags().StringVarP(&projectType, "project-type", "p", "spring", "Connection project type to generate")
+	postgresCmd.Flags().StringVarP(&format, "format", "f", "yml", "Format of the connection to generate")
 }

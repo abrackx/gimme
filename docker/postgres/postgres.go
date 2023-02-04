@@ -41,7 +41,7 @@ func Start() docker.Container {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Starting postgres container: %s using port %d with username: %s and password: %s", containerName, port, username, password)
+	fmt.Printf("Starting postgres container: %s using port %d with username: %s and password: %s\n", containerName, port, username, password)
 	//docker run -e POSTGRES_PASSWORD=secrect -e POSTGRES_USER=postgres <other options> image/name
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
 		Image: "postgres",
