@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"gimme/docker"
+	"gimme/template"
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/docker/docker/api/types"
 	"github.com/spf13/cobra"
@@ -40,6 +41,8 @@ func selectContainerPrompt() types.Container {
 		println("No containers to remove")
 		os.Exit(0)
 	}
+
+	survey.SelectQuestionTemplate = template.SurveyTemplate()
 
 	var result string
 	prompt := &survey.Select{
