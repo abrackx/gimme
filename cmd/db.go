@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gimme/docker"
 	"gimme/docker/postgres"
+	"gimme/template"
 	"github.com/spf13/cobra"
 )
 
@@ -14,19 +15,22 @@ const (
 // dbCmd represents the db command
 var dbCmd = &cobra.Command{
 	Use:   "db",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Start a new database container",
+	Long: `Start a new database container on a random port.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Usage:
+	gimme db postgres
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		docker.IsDockerRunning()
+		//TODO: Output to different project types ex: --project-type spring --format yml
 		for _, arg := range args {
 			switch arg {
 			case POSTGRES:
-				postgres.Start()
+				{
+					container := postgres.Start()
+					template.PrintSpringTemplate(container.Database)
+				}
 			default:
 				fmt.Printf("Looks like you didn't choose a valid database! Current supported databases are: %s\n", POSTGRES)
 			}
@@ -36,14 +40,4 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(dbCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// dbCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// dbCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

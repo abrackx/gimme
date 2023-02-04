@@ -3,6 +3,8 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"gimme/database"
+	"gimme/docker"
 	"gimme/util"
 	"github.com/docker/go-connections/nat"
 	"io"
@@ -16,7 +18,7 @@ import (
 
 const POSTGRES = "postgres"
 
-func Start() {
+func Start() docker.Container {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -34,7 +36,7 @@ func Start() {
 
 	username := util.GenerateName()
 	password := "password"
-	containerName := fmt.Sprintf("gimmie-%s-%s", username, POSTGRES)
+	containerName := fmt.Sprintf("gimme-%s-%s", username, POSTGRES)
 	listener, err := net.Listen("tcp", ":0")
 	if err != nil {
 		panic(err)
@@ -69,5 +71,16 @@ func Start() {
 
 	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
 		panic(err)
+	}
+
+	database := database.Database{
+		Port:     port,
+		Username: username,
+		Password: password,
+	}
+
+	return docker.Container{
+		Name:     containerName,
+		Database: database,
 	}
 }

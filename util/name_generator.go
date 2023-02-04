@@ -1,8 +1,6 @@
 package util
 
 import (
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	"math/rand"
 	"time"
 )
@@ -10,7 +8,7 @@ import (
 func GenerateName() string {
 	rand.NewSource(time.Now().Unix())
 	adjective, noun := adjectives[rand.Intn(len(adjectives))], nouns[rand.Intn(len(nouns))]
-	return cases.Title(language.Und, cases.NoLower).String(adjective) + cases.Title(language.Und, cases.NoLower).String(noun)
+	return adjective + noun
 }
 
 var adjectives = []string{
