@@ -6,14 +6,11 @@ import (
 	"gimme/database"
 	"gimme/docker"
 	"gimme/util"
-	"github.com/docker/go-connections/nat"
-	"io"
-	"net"
-	"os"
-
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+	"github.com/docker/go-connections/nat"
+	"net"
 )
 
 const POSTGRES = "postgres"
@@ -30,9 +27,7 @@ func Start() docker.Container {
 	if err != nil {
 		panic(err)
 	}
-
 	defer reader.Close()
-	io.Copy(os.Stdout, reader)
 
 	username := util.GenerateName()
 	password := "password"
