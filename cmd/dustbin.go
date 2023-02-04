@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	"fmt"
 	"gimme/docker"
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/docker/docker/api/types"
-	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"os"
 	"strings"
@@ -18,11 +17,8 @@ var dustbinCmd = &cobra.Command{
 Usage:
 	gimme dustbin`,
 	Run: func(cmd *cobra.Command, args []string) {
-		categoryPromptContent := promptContent{
-			"Something bad happened.",
-			"Which container do you want to delete?",
-		}
-		docker.DeleteContainer(promptGetSelect(categoryPromptContent))
+		container := selectContainerPrompt()
+		docker.DeleteContainer(container)
 	},
 }
 
@@ -30,12 +26,7 @@ func init() {
 	rootCmd.AddCommand(dustbinCmd)
 }
 
-type promptContent struct {
-	errorMsg string
-	label    string
-}
-
-func promptGetSelect(pc promptContent) types.Container {
+func selectContainerPrompt() types.Container {
 	data := map[string]types.Container{}
 	for _, container := range docker.GetContainers() {
 		data[strings.Join(container.Names, ", ")] = container
@@ -45,22 +36,19 @@ func promptGetSelect(pc promptContent) types.Container {
 		containerNames = append(containerNames, key)
 	}
 
-	index := -1
-	var result string
-	var err error
-
-	for index < 0 {
-		prompt := promptui.Select{
-			Label: pc.label,
-			Items: containerNames,
-		}
-
-		index, result, err = prompt.Run()
+	if len(containerNames) == 0 {
+		println("No containers to remove")
+		os.Exit(0)
 	}
 
+	var result string
+	prompt := &survey.Select{
+		Message: "Which container do you want to delete?",
+		Options: containerNames,
+	}
+	err := survey.AskOne(prompt, &result)
 	if err != nil {
-		fmt.Printf("Prompt failed %v\n", err)
-		os.Exit(1)
+		panic(err)
 	}
 
 	return data[result]
